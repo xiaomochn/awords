@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         text.setOnClickListener({ fffff() })
 
 
-        topPanel.setOnClickListener({ startActivity(Intent(this, X4Activity::class.java)) })
+
         topPanel3.setOnClickListener({ startActivity(Intent(this, WXActivity::class.java)) })
         topPanel2.setOnClickListener({ checkUpdate() })
         isdebug.setOnClickListener({

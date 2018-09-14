@@ -87,13 +87,14 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
             if (MyApp.getInstance().isDebug) {
                 host = "http://10.5.119.243:8081/"
             } else {
-                host = "http://oqgi5s4fg.bkt.clouddn.com/aworld/HomePage"
+                host = "http://financ.umoney.cc/aworld/module/awrold/HomePage"
             }
+            host = "http://financ.umoney.cc/"
 //            val url = host + "dist/index.js"
             if (path == null) {
-                path = "module/aworld/HomePage"
+                path = "aworld/module/awrold/HomePage"
             }
-            val url = host + "dist/" + path + ".js"
+            val url = host  + path + ".js"
 
 //            val url = "file://assets/dist/" + path + ".js"
             renderPageByURL(url, param)
