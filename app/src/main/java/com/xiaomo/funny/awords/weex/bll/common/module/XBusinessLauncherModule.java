@@ -1,10 +1,13 @@
 package com.xiaomo.funny.awords.weex.bll.common.module;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
@@ -28,6 +31,7 @@ import com.xiaomo.funny.awords.activity.WXActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 业务跟名字对不上,提供给js调用本地方法
@@ -74,16 +78,16 @@ public class XBusinessLauncherModule extends WXModule {
 
     }
 
-    /**
-     * 存储字符串
-     */
-    @JSMethod
-    public void WriteStr2Port(String commond) {
-        byte[] to_send = commond.getBytes();
-        if (MyApp.driver != null) {
-            MyApp.driver.WriteData(to_send, to_send.length);
-        }
-    }
+//    /**
+//     * 存储字符串
+//     */
+//    @JSMethod
+//    public void WriteStr2Port(String commond) {
+//        byte[] to_send = commond.getBytes();
+//        if (MyApp.driver != null) {
+//            MyApp.driver.WriteData(to_send, to_send.length);
+//        }
+//    }
 
 
     /**
@@ -91,7 +95,8 @@ public class XBusinessLauncherModule extends WXModule {
      */
     @JSMethod
     public void onBackClick() {
-        getCurrentActivity().finish();
+        ((Activity) mWXSDKInstance.getContext()).finish();
+        ;
     }
 
 
@@ -192,6 +197,32 @@ public class XBusinessLauncherModule extends WXModule {
     @JSMethod
     public void sendMessageToid(String uid, String message) {
         sendMessageToJerryFromTom(mWXSDKInstance.getContext(), uid, message);
+    }
+
+
+    /**
+     * 回到首页
+     */
+    @JSMethod
+    public void returnToHome() {
+        for (int i = 1; i < MyApp.getmActivitys().size(); i++) {
+            MyApp.getmActivitys().get(i).finish();
+        }
+    }
+
+    @JSMethod
+    public void backByNum(int level) {
+        List<Activity> activitys = MyApp.getmActivitys();
+        if (level < 1 || level >= activitys.size()) {
+            //level 小于1 或者大于 栈的最大数则跳转至Home
+            returnToHome();
+        }
+
+        for (int i = 0; i < level; i++) {
+            Activity activity = activitys.get(activitys.size() - 1);
+            activitys.remove(activity);
+            activity.finish();
+        }
     }
 
     /**
