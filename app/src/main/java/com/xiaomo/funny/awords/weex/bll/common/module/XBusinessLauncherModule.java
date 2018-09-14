@@ -1,4 +1,4 @@
-package com.xiaomo.funny.home.weex.bll.common.module;
+package com.xiaomo.funny.awords.weex.bll.common.module;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,10 +21,10 @@ import com.google.gson.reflect.TypeToken;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
-import com.xiaomo.funny.home.MyApp;
-import com.xiaomo.funny.home.XConstant;
-import com.xiaomo.funny.home.model.UserModel;
-import com.xiaomo.funny.home.activity.WXActivity;
+import com.xiaomo.funny.awords.MyApp;
+import com.xiaomo.funny.awords.XConstant;
+import com.xiaomo.funny.awords.model.UserModel;
+import com.xiaomo.funny.awords.activity.WXActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;

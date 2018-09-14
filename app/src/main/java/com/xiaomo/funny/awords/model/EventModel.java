@@ -1,4 +1,4 @@
-package com.xiaomo.funny.home.model;
+package com.xiaomo.funny.awords.model;
 
 /**
  * 客户端发来的请求

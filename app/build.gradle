@@ -9,18 +9,18 @@ apply plugin: 'com.taobao.android.weex.plugin.gradle'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.xiaomo.funny.home"
+        applicationId "com.xiaomo.funny.awords"
         minSdkVersion 15
         targetSdkVersion 26
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true }}
         versionCode 5
-        versionName "beta0.5"
+        versionName "1.0.0"
 
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
-                JPUSH_PKGNAME: "com.xiaomo.funny.home",
-                JPUSH_APPKEY : "0128a7f5707ccf1b451ba8aa", //JPush上注册的包名对应的appkey.
+                JPUSH_PKGNAME: "com.xiaomo.funny.awords",
+                JPUSH_APPKEY : "2fd908769007572c63e3a1c6", //JPush上注册的包名对应的appkey.
                 JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
         ]
     }
@@ -35,7 +35,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.android.support:support-annotations:${project.supportLibVersion}"

@@ -1,4 +1,4 @@
-package com.xiaomo.funny.home.activity
+package com.xiaomo.funny.awords.activity
 
 
 import android.content.Intent
@@ -12,9 +12,9 @@ import com.iflytek.autoupdate.IFlytekUpdate
 import com.iflytek.autoupdate.UpdateConstants
 import com.iflytek.autoupdate.UpdateErrorCode
 import com.iflytek.autoupdate.UpdateType
-import com.xiaomo.funny.home.MyApp
-import com.xiaomo.funny.home.R
-import com.xiaomo.funny.home.service.ReadOtgServes
+import com.xiaomo.funny.awords.MyApp
+import com.xiaomo.funny.awords.R
+
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 import java.util.*
@@ -29,6 +29,9 @@ class MainActivity : AppCompatActivity() {
         val registrationID = JPushInterface.getRegistrationID(application)
         val appId = DeviceUtils.getAndroidID(application)
         JPushInterface.setAlias(application, Date().time.toInt(), appId)
+        MyApp.getInstance().isDebug = true
+        startActivity(Intent(this, WXActivity::class.java))
+
         text.text = appId + " regis: " + registrationID
         text.setOnClickListener({ fffff() })
 
@@ -89,9 +92,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        ReadOtgServes.startService(applicationContext)
-    }
+
 
 }

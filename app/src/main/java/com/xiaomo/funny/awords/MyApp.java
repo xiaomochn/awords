@@ -1,4 +1,4 @@
-package com.xiaomo.funny.home;
+package com.xiaomo.funny.awords;
 
 import android.app.Application;
 import android.content.Context;
@@ -12,9 +12,9 @@ import com.orhanobut.logger.Logger;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
-import com.xiaomo.funny.home.weex.bll.common.module.DialogModule;
-import com.xiaomo.funny.home.weex.bll.common.module.XBusinessLauncherModule;
-import com.xiaomo.funny.home.weex.extend.adapter.FrescoImageAdapter;
+import com.xiaomo.funny.awords.weex.bll.common.module.DialogModule;
+import com.xiaomo.funny.awords.weex.bll.common.module.XBusinessLauncherModule;
+import com.xiaomo.funny.awords.weex.extend.adapter.FrescoImageAdapter;
 
 import cn.wch.ch34xuartdriver.CH34xUARTDriver;
 

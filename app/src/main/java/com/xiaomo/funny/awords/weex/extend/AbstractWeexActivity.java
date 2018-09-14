@@ -202,194 +202,232 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaomo.funny.home.weex.extend.adapter;
+package com.xiaomo.funny.awords.weex.extend;
 
-import android.graphics.Color;
-import android.graphics.drawable.Animatable;
-import android.net.Uri;
+import android.content.Intent;
+import android.graphics.Rect;
+import android.os.Bundle;
+import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.util.Log;
-import android.widget.ImageView;
+import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
 
-import com.facebook.common.executors.UiThreadImmediateExecutorService;
-import com.facebook.common.internal.Preconditions;
-import com.facebook.common.logging.FLog;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.BaseDataSubscriber;
-import com.facebook.datasource.DataSource;
-import com.facebook.datasource.DataSubscriber;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.controller.BaseControllerListener;
-import com.facebook.drawee.controller.ControllerListener;
-import com.facebook.drawee.interfaces.DraweeController;
-import com.facebook.drawee.view.DraweeView;
-import com.facebook.imagepipeline.common.ImageDecodeOptions;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.image.CloseableStaticBitmap;
-import com.facebook.imagepipeline.image.ImageInfo;
-import com.facebook.imagepipeline.image.QualityInfo;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.common.WXImageStrategy;
-import com.taobao.weex.dom.WXImageQuality;
+import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXRenderStrategy;
+import com.xiaomo.funny.awords.util.ScreenUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by sospartan on 5/30/16.
+ */
+public abstract class AbstractWeexActivity extends AppCompatActivity implements IWXRenderListener {
+
+  private static final String TAG = "AbstractWeexActivity";
+
+  private ViewGroup mContainer;
+  private WXSDKInstance mInstance;
+
+  protected WXAnalyzerDelegate mWxAnalyzerDelegate;
 
 
-public class FrescoImageAdapter implements IWXImgLoaderAdapter {
+  @Override
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    createWeexInstance();
+    mInstance.onActivityCreate();
+    mWxAnalyzerDelegate = new WXAnalyzerDelegate(this);
+    mWxAnalyzerDelegate.onCreate();
+  }
 
-    public FrescoImageAdapter() {
+  protected final void setContainer(ViewGroup container){
+    mContainer = container;
+  }
+
+  protected final ViewGroup getContainer(){
+    return mContainer;
+  }
+
+  protected void destoryWeexInstance(){
+    if(mInstance != null){
+      mInstance.registerRenderListener(null);
+      mInstance.destroy();
+      mInstance = null;
+    }
+  }
+
+  protected void createWeexInstance(){
+    destoryWeexInstance();
+
+    Rect outRect = new Rect();
+    getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
+
+    mInstance = new WXSDKInstance(this);
+    mInstance.registerRenderListener(this);
+  }
+
+  protected WXSDKInstance getInstance(){
+    if(mInstance != null){
+      return mInstance;
     }
 
-    @Override
-    public void setImage(final String url, final ImageView view,
-                         WXImageQuality quality, WXImageStrategy strategy) {
+    return null;
+  }
 
-        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+  protected void renderPage(String template,String source){
+    renderPage(template,source,null);
+  }
 
-            @Override
-            public void run() {
-                if (view == null || view.getLayoutParams() == null) {
-                    return;
-                }
-                if (TextUtils.isEmpty(url)) {
-                    view.setImageBitmap(null);
-                    return;
-                }
-                if (loadLocalImage(url,view)){
-                    return;
-                }
+  protected void renderPage(String template,String source,String jsonInitData){
 
-                String temp = url;
-                if (url.startsWith("http")) {
-                    temp = url;
-                }
-                if (view.getLayoutParams().width <= 0 || view.getLayoutParams().height <= 0) {
-                    return;
-                }
+    Map<String, Object> options = new HashMap<>();
+    options.put(WXSDKInstance.BUNDLE_URL, source);
+    mInstance.render(
+      getPageName(),
+      template,
+      options,
+      jsonInitData,
+      ScreenUtil.getDisplayWidth(this),
+      ScreenUtil.getDisplayHeight(this),
+      WXRenderStrategy.APPEND_ASYNC);
+  }
 
-                Uri uri = Uri.parse(temp);
+  protected void renderPageByURL(String url){
+    renderPageByURL(url,null);
+  }
 
-                ImageDecodeOptions decodeOptions = ImageDecodeOptions.newBuilder()
-                        .setBackgroundColor(Color.GREEN)
-                        .build();
+  protected void renderPageByURL(String url,String jsonInitData){
+    Map<String, Object> options = new HashMap<>();
+    options.put(WXSDKInstance.BUNDLE_URL, url);
+    mInstance.renderByUrl(
+      getPageName(),
+      url,
+      options,
+      jsonInitData,
+      ScreenUtil.getDisplayWidth(this),
+      ScreenUtil.getDisplayHeight(this),
+      WXRenderStrategy.APPEND_ASYNC);
+  }
 
-                ImageRequest request = ImageRequestBuilder
-                        .newBuilderWithSource(uri)
-                        .setImageDecodeOptions(decodeOptions)
-                        .setAutoRotateEnabled(true)
-                        .setLocalThumbnailPreviewsEnabled(true)
-                        .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
-                        .setProgressiveRenderingEnabled(false)
-                        .build();
+  protected String getPageName(){
+    return TAG;
+  }
 
-                if(view instanceof DraweeView){
-                    Log.d("FrescoImageAdapter","load: "+url);
-                    ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
-                        @Override
-                        public void onFinalImageSet(
-                            String id,
-                            @Nullable ImageInfo imageInfo,
-                            @Nullable Animatable anim) {
-                            if (imageInfo == null) {
-                                return;
-                            }
-                            QualityInfo qualityInfo = imageInfo.getQualityInfo();
-                            FLog.d("Final image received! " +
-                                    "Size %d x %d",
-                                "Quality level %d, good enough: %s, full quality: %s",
-                                imageInfo.getWidth(),
-                                imageInfo.getHeight(),
-                                qualityInfo.getQuality(),
-                                qualityInfo.isOfGoodEnoughQuality(),
-                                qualityInfo.isOfFullQuality());
-                        }
-
-                        @Override
-                        public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
-                            FLog.d("","Intermediate image received");
-                        }
-
-                        @Override
-                        public void onFailure(String id, Throwable throwable) {
-                            FLog.e(getClass(), throwable, "Error loading %s", id);
-                        }
-                    };
-                    DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setAutoPlayAnimations(true)
-                        .setControllerListener(controllerListener)
-                        .setUri(uri)
-                        .setImageRequest(request)
-                        .build();
-                    ((DraweeView)view).setController(controller);
-
-                }else {
-                    ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                    DataSource<CloseableReference<CloseableImage>>
-                        dataSource = imagePipeline.fetchDecodedImage(request, new Object());
-                    DataSubscriber dataSubscriber =
-                        new BaseDataSubscriber<CloseableReference<CloseableImage>>() {
-                            @Override
-                            public void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-
-                                CloseableReference<CloseableImage> imageReference = dataSource.getResult();
-                                if (imageReference != null) {
-                                    try {
-                                        // do something with the image
-                                        Preconditions.checkState(CloseableReference.isValid(imageReference));
-                                        CloseableImage closeableImage = imageReference.get();
-                                        if (closeableImage instanceof CloseableStaticBitmap) {
-                                            CloseableStaticBitmap closeableStaticBitmap = (CloseableStaticBitmap) closeableImage;
-                                            view.setImageBitmap(closeableStaticBitmap.getUnderlyingBitmap());
-                                            // boolean hasResult =  null != closeableStaticBitmap.getUnderlyingBitmap();
-                                        } else {
-                                            throw new UnsupportedOperationException("Unrecognized image class: " + closeableImage);
-                                        }
-                                    } finally {
-                                        imageReference.close();
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailureImpl(DataSource dataSource) {
-                            }
-                        };
-
-                    dataSource.subscribe(dataSubscriber, UiThreadImmediateExecutorService.getInstance());
-                }
-            }
-        }, 0);
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    super.onActivityResult(requestCode, resultCode, intent);
+    if(mInstance!=null){
+      mInstance.onActivityResult(requestCode,resultCode,intent);
     }
+  }
 
-
-    private boolean loadLocalImage(final String url, final ImageView view){
-
-        if (url.startsWith("http")){
-            return false;
-        }
-
-//        if (url.startsWith("file://assets/")){
-//            String relatePath = url.substring(url.indexOf("//") + 9);
-//            Bitmap bitmap = ImageUtil.getBitmapInAssets(ApplicationEx.getInstance(),relatePath);
-//            if (bitmap != null){
-//                view.setImageBitmap(bitmap);
-//            }
-//
-//            return true;
-//        }
-//
-//        if (url.startsWith("/data/")){
-//            Bitmap bitmap = ImageUtil.getBitmapByFile(url);
-//            if (bitmap != null){
-//                view.setImageBitmap(bitmap);
-//            }
-//            return true;
-//        }
-
-        return false;
+  @Override
+  public void onStart() {
+    super.onStart();
+    if(mInstance!=null){
+      mInstance.onActivityStart();
     }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onStart();
+    }
+  }
 
+  @Override
+  public void onResume() {
+    super.onResume();
+    if(mInstance!=null){
+      mInstance.onActivityResume();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onResume();
+    }
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    if(mInstance!=null){
+      mInstance.onActivityPause();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onPause();
+    }
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    if(mInstance!=null){
+      mInstance.onActivityStop();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onStop();
+    }
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    if(mInstance!=null){
+      mInstance.onActivityDestroy();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onDestroy();
+    }
+  }
+
+  @Override
+  public void onViewCreated(WXSDKInstance wxsdkInstance, View view) {
+    View wrappedView = null;
+    if(mWxAnalyzerDelegate != null){
+      wrappedView = mWxAnalyzerDelegate.onWeexViewCreated(wxsdkInstance,view);
+    }
+    if(wrappedView != null){
+      view = wrappedView;
+    }
+    if (mContainer != null) {
+      mContainer.removeAllViews();
+      mContainer.addView(view);
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    if (mInstance != null){
+        mInstance.onRequestPermissionsResult(requestCode,permissions,grantResults);
+    }
+  }
+
+  @Override
+  public void onRefreshSuccess(WXSDKInstance wxsdkInstance, int i, int i1) {
+
+  }
+
+  @Override
+  @CallSuper
+  public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
+    if(mWxAnalyzerDelegate  != null){
+      mWxAnalyzerDelegate.onWeexRenderSuccess(instance);
+    }
+  }
+
+  @Override
+  @CallSuper
+  public void onException(WXSDKInstance instance, String errCode, String msg) {
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onException(instance,errCode,msg);
+    }
+  }
+
+  @Override
+  @CallSuper
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    return (mWxAnalyzerDelegate != null && mWxAnalyzerDelegate.onKeyUp(keyCode,event)) || super.onKeyUp(keyCode, event);
+  }
 }

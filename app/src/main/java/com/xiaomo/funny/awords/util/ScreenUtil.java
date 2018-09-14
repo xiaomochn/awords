@@ -202,178 +202,114 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaomo.funny.home.weex.extend;
+package com.xiaomo.funny.awords.util;
 
-import android.content.Context;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.view.KeyEvent;
-import android.view.View;
+import android.content.res.TypedArray;
+import android.graphics.Point;
+import android.os.Build;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
-import com.taobao.weex.WXSDKInstance;
-
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * Description:
- * <p>
- * Created by rowandjj(chuyi)<br/>
- * Date: 2016/10/27<br/>
- * Time: 下午7:01<br/>
+ * @author qiao
  */
+public class ScreenUtil {
+    private static final String TAG = "WXTBUtil";
 
-public final class WXAnalyzerDelegate {
-    private Object mWXAnalyzer;
+    private static boolean isSupportSmartBar = false;
 
-    private static boolean ENABLE = false;
-
-    @SuppressWarnings("unchecked")
-    public WXAnalyzerDelegate(@Nullable Context context) {
-        if(!ENABLE){
-            return;
+    static {
+        isSupportSmartBar = isSupportSmartBar();
+    }
+    public static int getDisplayWidth(AppCompatActivity activity){
+        int width=0;
+        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
+            Point point=new Point();
+            activity.getWindowManager().getDefaultDisplay().getSize(point);
+            width = point.x;
         }
-        if(context == null){
-            return;
-        }
-        try {
-            Class clazz = Class.forName("com.taobao.weex.analyzer.WeexDevOptions");
-            Constructor constructor = clazz.getDeclaredConstructor(Context.class);
-            mWXAnalyzer = constructor.newInstance(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return width;
     }
 
-    public void onCreate() {
-        if (mWXAnalyzer == null) {
-            return;
+    public static int getDisplayHeight(AppCompatActivity activity) {
+        int height = 0;
+        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
+            Point point=new Point();
+            activity.getWindowManager().getDefaultDisplay().getSize(point);
+            height=point.y;
         }
-        try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onCreate");
-            method.invoke(mWXAnalyzer);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        Log.e(TAG, "isSupportSmartBar:" + isSupportSmartBar);
+
+        if (isSupportSmartBar) {
+            int smartBarHeight = getSmartBarHeight(activity);
+            Log.e(TAG, "smartBarHeight:" + smartBarHeight);
+            height -= smartBarHeight;
         }
+
+        if (activity.getSupportActionBar() != null) {
+          int actionbar= activity.getSupportActionBar().getHeight();
+          if(actionbar==0){
+            TypedArray actionbarSizeTypedArray=activity.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
+            actionbar= (int) actionbarSizeTypedArray.getDimension(0,0);
+          }
+          Log.d(TAG, "actionbar:" + actionbar);
+          height -= actionbar;
+        }
+
+        int status = getStatusBarHeight(activity);
+        Log.d(TAG, "status:" + status);
+
+        height -= status;
+
+        Log.d(TAG,"height:"+height);
+        return height;
     }
 
-
-    public void onStart() {
-        if (mWXAnalyzer == null) {
-            return;
-        }
+    private static int getStatusBarHeight(AppCompatActivity activity) {
+        Class<?> c;
+        Object obj;
+        Field field;
+        int x;
+        int statusBarHeight = 0;
         try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onStart");
-            method.invoke(mWXAnalyzer);
-        } catch (Exception e) {
-            e.printStackTrace();
+            c = Class.forName("com.android.internal.R$dimen");
+            obj = c.newInstance();
+            field = c.getField("status_bar_height");
+            x = Integer.parseInt(field.get(obj).toString());
+            statusBarHeight = activity.getResources().getDimensionPixelSize(x);
+        } catch (Exception e1) {
+            e1.printStackTrace();
         }
+        return statusBarHeight;
     }
 
-    public void onResume() {
-        if (mWXAnalyzer == null) {
-            return;
-        }
-        try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onResume");
-            method.invoke(mWXAnalyzer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private static int getSmartBarHeight(AppCompatActivity activity) {
+        ActionBar actionbar = activity.getSupportActionBar();
+        if (actionbar != null)
+            try {
+                Class c = Class.forName("com.android.internal.R$dimen");
+                Object obj = c.newInstance();
+                Field field = c.getField("mz_action_button_min_height");
+                int height = Integer.parseInt(field.get(obj).toString());
+                return activity.getResources().getDimensionPixelSize(height);
+            } catch (Exception e) {
+                e.printStackTrace();
+                actionbar.getHeight();
+            }
+        return 0;
     }
 
-
-    public void onPause() {
-        if (mWXAnalyzer == null) {
-            return;
-        }
+    private static boolean isSupportSmartBar() {
         try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onPause");
-            method.invoke(mWXAnalyzer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onStop() {
-        if (mWXAnalyzer == null) {
-            return;
-        }
-        try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onStop");
-            method.invoke(mWXAnalyzer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onDestroy() {
-        if (mWXAnalyzer == null) {
-            return;
-        }
-        try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onDestroy");
-            method.invoke(mWXAnalyzer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void onWeexRenderSuccess(@Nullable WXSDKInstance instance) {
-        if (mWXAnalyzer == null || instance == null) {
-            return;
-        }
-        try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onWeexRenderSuccess", WXSDKInstance.class);
-            method.invoke(mWXAnalyzer, instance);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (mWXAnalyzer == null) {
-            return false;
-        }
-        try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onKeyUp", int.class, KeyEvent.class);
-            return (boolean) method.invoke(mWXAnalyzer, keyCode, event);
-        } catch (Exception e) {
-            e.printStackTrace();
+            final Method method = Build.class.getMethod("hasSmartBar");
+            return method != null;
+        } catch (final Exception e) {
             return false;
         }
     }
-
-    public void onException(WXSDKInstance instance, String errCode, String msg) {
-        if (mWXAnalyzer == null) {
-            return;
-        }
-        if (TextUtils.isEmpty(errCode) && TextUtils.isEmpty(msg)) {
-            return;
-        }
-        try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onException", WXSDKInstance.class, String.class, String.class);
-            method.invoke(mWXAnalyzer, instance, errCode, msg);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public View onWeexViewCreated(WXSDKInstance instance, View view) {
-        if (mWXAnalyzer == null || instance == null || view == null) {
-            return null;
-        }
-        try {
-            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onWeexViewCreated", WXSDKInstance.class, View.class);
-            View retView = (View) method.invoke(mWXAnalyzer, instance, view);
-            return retView;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return view;
-        }
-    }
-
 }

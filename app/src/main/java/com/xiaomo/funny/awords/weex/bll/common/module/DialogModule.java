@@ -1,4 +1,4 @@
-package com.xiaomo.funny.home.weex.bll.common.module;
+package com.xiaomo.funny.awords.weex.bll.common.module;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

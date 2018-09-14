@@ -1,4 +1,4 @@
-package com.xiaomo.funny.home.activity
+package com.xiaomo.funny.awords.activity
 
 import android.content.Context
 import android.os.Bundle
@@ -10,12 +10,12 @@ import com.hwangjr.rxbus.thread.EventThread
 import com.taobao.weex.IWXRenderListener
 import com.taobao.weex.WXSDKInstance
 import com.taobao.weex.common.WXRenderStrategy
-import com.xiaomo.funny.home.R
-import com.xiaomo.funny.home.MyApp
-import com.xiaomo.funny.home.model.OtgDataModel
-import com.xiaomo.funny.home.model.EventModel
-import com.xiaomo.funny.home.model.UserModel
-import com.xiaomo.funny.home.util.ScreenUtil
+import com.xiaomo.funny.awords.R
+import com.xiaomo.funny.awords.MyApp
+import com.xiaomo.funny.awords.model.OtgDataModel
+import com.xiaomo.funny.awords.model.EventModel
+import com.xiaomo.funny.awords.model.UserModel
+import com.xiaomo.funny.awords.util.ScreenUtil
 import java.util.*
 import android.telephony.TelephonyManager
 import org.json.JSONException
@@ -43,7 +43,7 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
          */
 
         val isDebut = true
-        getSerialNumber()
+//        getSerialNumber()
         if (!isDebut) {
             //本地文件路径，读取代码片段
 //            var bundleUrl = ""
@@ -87,11 +87,11 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
             if (MyApp.getInstance().isDebug) {
                 host = "http://10.5.119.243:8081/"
             } else {
-                host = "http://oqgi5s4fg.bkt.clouddn.com/homevue/"
+                host = "http://oqgi5s4fg.bkt.clouddn.com/aworld/HomePage"
             }
 //            val url = host + "dist/index.js"
             if (path == null) {
-                path = "module/home"
+                path = "module/aworld/HomePage"
             }
             val url = host + "dist/" + path + ".js"
 
@@ -100,32 +100,6 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
         }
     }
 
-    private fun getSerialNumber(): String? {
-
-        var serial: String? = null
-
-        try {
-
-            val c = Class.forName("android.os.SystemProperties")
-
-            val get = c.getMethod("get", String::class.java)
-
-            serial = get.invoke(c, "ro.serialno") as String
-
-        } catch (e: Exception) {
-
-            e.printStackTrace()
-
-        }
-        Log.d("111111",serial)
-
-
-
-        val imei = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId
-        Log.d("111111imei",imei)
-        return serial
-
-    }
 
     protected fun renderPageByURL(url: String, jsonInitData: String?) {
 
@@ -178,24 +152,6 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
         }
     }
 
-    @Subscribe(thread = EventThread.MAIN_THREAD)
-    fun onNewUserEvent(userModel: UserModel) {
-        val params = HashMap<String, Any>()
-        params.put("userNickname", userModel.userNickname)
-        params.put("userId", userModel.userId)
-        mWXSDKInstance?.fireGlobalEventCallback("onnewuser", params)
-
-    }
-
-    @Subscribe(thread = EventThread.MAIN_THREAD)
-    fun onReadPortEvent(userModel: OtgDataModel) {
-        userModel.commond?.let {
-            val params = HashMap<String, Any>()
-            params.put("commond", it)
-            mWXSDKInstance?.fireGlobalEventCallback("onReadPortEvent", params)
-        }
-
-    }
 
     @Subscribe(thread = EventThread.MAIN_THREAD)
     fun ongetJpush(userModel: EventModel) {

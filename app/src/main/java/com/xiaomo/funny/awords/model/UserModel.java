@@ -1,4 +1,4 @@
-package com.xiaomo.funny.home.model;
+package com.xiaomo.funny.awords.model;
 
 /**
  * Created by qiao on 17/01/2018.

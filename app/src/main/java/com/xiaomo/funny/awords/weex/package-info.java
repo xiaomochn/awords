@@ -7,4 +7,4 @@
  *
  * @author qiao
  */
-package com.xiaomo.funny.home.weex;
+package com.xiaomo.funny.awords.weex;

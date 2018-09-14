@@ -1,4 +1,4 @@
-package com.xiaomo.funny.home;
+package com.xiaomo.funny.awords;
 
 
 /**

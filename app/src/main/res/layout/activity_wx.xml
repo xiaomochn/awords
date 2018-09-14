@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.xiaomo.funny.home.activity.WXActivity">
+    android:background="@drawable/bg"
+    tools:context="com.xiaomo.funny.awords.activity.WXActivity">
 
 </android.support.constraint.ConstraintLayout>
