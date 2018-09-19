@@ -32,19 +32,20 @@ class MainActivity : AppCompatActivity() {
         MyApp.getInstance().isDebug = true
         startActivity(Intent(this, WXActivity::class.java))
 
+        finish();
         text.text = appId + " regis: " + registrationID
         text.setOnClickListener({ fffff() })
 
 
 
-        topPanel3.setOnClickListener({ startActivity(Intent(this, WXActivity::class.java)) })
-        topPanel2.setOnClickListener({ checkUpdate() })
-        isdebug.setOnClickListener({
+        topPanel3.setOnClickListener { startActivity(Intent(this, WXActivity::class.java)) }
+        topPanel2.setOnClickListener { checkUpdate() }
+        isdebug.setOnClickListener {
             MyApp.getInstance().isDebug = !MyApp.getInstance().isDebug
 
             isdebug.setText("isDebug" + MyApp.getInstance().isDebug)
 
-        })
+        }
     }
 
     fun fffff() {
@@ -71,9 +72,9 @@ class MainActivity : AppCompatActivity() {
         updManager.setParameter(UpdateConstants.EXTRA_NOTI_ICON, "false")
         updManager.setParameter(UpdateConstants.EXTRA_STYLE, UpdateConstants.UPDATE_UI_DIALOG)
 
-        updManager.autoUpdate(this@MainActivity, { errorcode, result ->
+        updManager.autoUpdate(this@MainActivity) { errorcode, result ->
             if (errorcode == UpdateErrorCode.OK && result != null) {
-                if (result!!.getUpdateType() === UpdateType.NoNeed) {
+                if (result.getUpdateType() === UpdateType.NoNeed) {
                     showTip("已经是最新版本！")
 
                 }
@@ -81,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 showTip("请求更新失败！\n更新错误码：$errorcode")
             }
-        })
+        }
 
 
     }

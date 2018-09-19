@@ -245,7 +245,7 @@ public class FrescoImageAdapter implements IWXImgLoaderAdapter {
 
     @Override
     public void setImage(final String url, final ImageView view,
-                         WXImageQuality quality, WXImageStrategy strategy) {
+                         WXImageQuality quality, final WXImageStrategy strategy) {
 
         WXSDKManager.getInstance().postOnUiThread(new Runnable() {
 
@@ -296,6 +296,9 @@ public class FrescoImageAdapter implements IWXImgLoaderAdapter {
                             if (imageInfo == null) {
                                 return;
                             }
+                            if(strategy.getImageListener()!=null){
+                                strategy.getImageListener().onImageFinish(url,view,true,null);
+                            }
                             QualityInfo qualityInfo = imageInfo.getQualityInfo();
                             FLog.d("Final image received! " +
                                     "Size %d x %d",
@@ -343,6 +346,9 @@ public class FrescoImageAdapter implements IWXImgLoaderAdapter {
                                         if (closeableImage instanceof CloseableStaticBitmap) {
                                             CloseableStaticBitmap closeableStaticBitmap = (CloseableStaticBitmap) closeableImage;
                                             view.setImageBitmap(closeableStaticBitmap.getUnderlyingBitmap());
+                                            if(strategy.getImageListener()!=null){
+                                                strategy.getImageListener().onImageFinish(url,view,true,null);
+                                            }
                                             // boolean hasResult =  null != closeableStaticBitmap.getUnderlyingBitmap();
                                         } else {
                                             throw new UnsupportedOperationException("Unrecognized image class: " + closeableImage);

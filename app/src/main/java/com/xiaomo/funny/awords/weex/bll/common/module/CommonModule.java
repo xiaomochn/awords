@@ -1,13 +1,14 @@
 package com.xiaomo.funny.awords.weex.bll.common.module;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
@@ -21,24 +22,29 @@ import com.code19.library.DeviceUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.qingmei2.rximagepicker.core.RxImagePicker;
+import com.qingmei2.rximagepicker.entity.Result;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
 import com.xiaomo.funny.awords.MyApp;
-import com.xiaomo.funny.awords.XConstant;
-import com.xiaomo.funny.awords.model.UserModel;
 import com.xiaomo.funny.awords.activity.WXActivity;
+import com.xiaomo.funny.awords.model.UserModel;
+import com.xiaomo.funny.awords.util.QiniuUploadUitls;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.functions.Consumer;
 
 /**
  * 业务跟名字对不上,提供给js调用本地方法
  *
  * @author qiao
  */
-public class XBusinessLauncherModule extends WXModule {
+public class CommonModule extends WXModule {
 
     private Activity getCurrentActivity() {
         Activity activity = null;
@@ -58,9 +64,69 @@ public class XBusinessLauncherModule extends WXModule {
         String action = "weex:" + url;
         intent.putExtra("url", url);
         intent.putExtra("param", param);
-        intent.putExtra(XConstant.BUSINESS_TYPE_KEY, action);
+
         _this.startActivity(intent);
 
+    }
+
+    @JSMethod
+    public void PickeImage(final JSCallback callbackId) {
+        RxImagePicker.INSTANCE
+                .create(MyImagePicker.class)
+                .openGallery(mWXSDKInstance.getContext())
+                .subscribe(new Consumer<Result>() {
+                    @Override
+                    public void accept(Result result) throws Exception {
+
+                        callbackId.invoke(getFilePathFromContentUri(result.getUri(), mWXSDKInstance.getContext()));
+                        // 对图片进行处理，比如加载到ImageView中
+//                        GlideApp.with(this)
+//                                .load(uri)
+//                                .into(ivPickedImage);
+                    }
+                });
+    }
+
+    public static String getFilePathFromContentUri(Uri selectedVideoUri, Context context) {
+        String filePath;
+        String[] filePathColumn = {MediaStore.MediaColumns.DATA};
+
+        Cursor cursor = context.getApplicationContext().getContentResolver().query(selectedVideoUri, filePathColumn, null, null, null);
+//      也可用下面的方法拿到cursor
+//      Cursor cursor = this.context.managedQuery(selectedVideoUri, filePathColumn, null, null, null);
+
+        cursor.moveToFirst();
+
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        filePath = cursor.getString(columnIndex);
+        cursor.close();
+        return filePath;
+    }
+
+    @JSMethod
+    public void uploadFile(String path, final JSCallback callbackId) {
+
+        QiniuUploadUitls.getInstance().uploadImage(path, new QiniuUploadUitls.QiniuUploadUitlsListener() {
+
+            @Override
+            public void onSucess(String fileUrl) {
+                // TODO Auto-generated method stub
+                callbackId.invoke(fileUrl);
+            }
+
+            @Override
+            public void onProgress(int progress) {
+                // TODO Auto-generated method stub
+                // pbProgress.setProgress(progress);
+            }
+
+            @Override
+            public void onError(int errorCode, String msg) {
+                // TODO Auto-generated method stub
+                // showToast("errorCode=" + errorCode + ",msg=" + msg);
+            }
+        });
+        return;
     }
 
     /**
@@ -77,17 +143,6 @@ public class XBusinessLauncherModule extends WXModule {
         }
 
     }
-
-//    /**
-//     * 存储字符串
-//     */
-//    @JSMethod
-//    public void WriteStr2Port(String commond) {
-//        byte[] to_send = commond.getBytes();
-//        if (MyApp.driver != null) {
-//            MyApp.driver.WriteData(to_send, to_send.length);
-//        }
-//    }
 
 
     /**

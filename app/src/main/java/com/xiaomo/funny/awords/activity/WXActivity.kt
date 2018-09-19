@@ -1,25 +1,19 @@
 package com.xiaomo.funny.awords.activity
 
-import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import com.hwangjr.rxbus.annotation.Subscribe
 import com.hwangjr.rxbus.thread.EventThread
 import com.taobao.weex.IWXRenderListener
 import com.taobao.weex.WXSDKInstance
 import com.taobao.weex.common.WXRenderStrategy
-import com.xiaomo.funny.awords.R
+import com.umeng.analytics.MobclickAgent
 import com.xiaomo.funny.awords.MyApp
-import com.xiaomo.funny.awords.model.OtgDataModel
-import com.xiaomo.funny.awords.model.EventModel
-import com.xiaomo.funny.awords.model.UserModel
+import com.xiaomo.funny.awords.R
 import com.xiaomo.funny.awords.util.ScreenUtil
-import java.util.*
-import android.telephony.TelephonyManager
-import org.json.JSONException
 import org.json.JSONObject
+import java.util.*
 
 
 /**
@@ -30,75 +24,38 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wx)
-//        setStatusBar()
         mWXSDKInstance = WXSDKInstance(this)
         mWXSDKInstance!!.registerRenderListener(this)
-        /**
-         * WXSample 可以替换成自定义的字符串，针对埋点有效。
-         * template 是.we transform 后的 js文件。
-         * option 可以为空，或者通过option传入 js需要的参数。例如bundle js的地址等。
-         * jsonInitData 可以为空。
-         * width 为-1 默认全屏，可以自己定制。
-         * height =-1 默认全屏，可以自己定制。
-         */
 
-        val isDebut = true
-//        getSerialNumber()
-        if (!isDebut) {
-            //本地文件路径，读取代码片段
-//            var bundleUrl = ""
-//            if (PropertiesUtil.isLoadAssetsWebapp()) {
-//                //Load Assets
-//                val assetsPath = WEEX_INDEX_PATH + anchor
-//                bundleUrl = "file://assets/$assetsPath.js"
-//                if (assetsPath != null) {
-//                    sourceTemplate = WXFileUtils.loadAsset(assetsPath!! + ".js", this)
-//                }
-//            } else {
-//                //Load Files Data
-//                try {
-//                    val absPath = filesDir.absolutePath + LOCAL_FILE_PATH + anchor + ".js"
-//                    bundleUrl = absPath
-//                    sourceTemplate = FileUtil.readFile(absPath)
-//                } catch (ex: IOException) {
-//                    LogUtil.print("zrzrzr", ex.message)
-//                }
-//
-//            }
-//
-//            if (sourceTemplate.length > 0) {
-//                renderPage(sourceTemplate, bundleUrl, data)
-//                getInstance().setBundleUrl(bundleUrl)
-//            }
-        } else {
-            //远程路径
-            var path = intent?.extras?.getString("url")
-            var param = intent?.extras?.getString("param")
-            var data : JSONObject? = null
-            var host = "http://10.5.6.245:8081/"
-            if (param == null) {
-                //data必须是json结构的字符串
-                param = "{}"
-
-            }
+        //远程路径
+        var path = intent?.extras?.getString("url")
+        var param = intent?.extras?.getString("param")
+        var host = "http://10.5.6.245:8081/"
+        if (param == null) {
+            //data必须是json结构的字符串
+            param = "{}"
+        }
 //            val host = "http://192.168.1.8:8081/"
-
+//        http@ //10.5.119.243:1234/homevue/dist/
 //            val host = "http://oqgi5s4fg.bkt.clouddn.com/homevue/"\
-            if (MyApp.getInstance().isDebug) {
-                host = "http://10.5.119.243:8081/"
-            } else {
-                host = "http://financ.umoney.cc/aworld/module/awrold/HomePage"
-            }
-            host = "http://financ.umoney.cc/"
+        if (MyApp.getInstance().isDebug) {
+            host = "http://10.5.119.243:1234/homevue/dist/"
+        } else {
+            host = "http://financ.umoney.cc/aworld/module/awrold/HomePage"
+        }
+
+//            host = "http://financ.umoney.cc/"
 //            val url = host + "dist/index.js"
-            if (path == null) {
-                path = "aworld/module/awrold/HomePage"
-            }
-            val url = host  + path + ".js"
+        host = "http://10.5.119.243:1234/homevue/dist/"
+        if (path == null) {
+            path = "module/aworld/HomePage"
+        }
+        val url = host + path + ".js"
 
 //            val url = "file://assets/dist/" + path + ".js"
-            renderPageByURL(url, param)
-        }
+        renderPageByURL(url, param)
+
+        MobclickAgent.onEvent(this,"pageopen",path)
     }
 
 
@@ -125,6 +82,7 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
     override fun onException(instance: WXSDKInstance, errCode: String, msg: String) {}
     override fun onResume() {
         super.onResume()
+        MobclickAgent.onResume(this)
         if (mWXSDKInstance != null) {
             mWXSDKInstance!!.onActivityResume()
         }
@@ -133,6 +91,7 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
 
     override fun onPause() {
         super.onPause()
+        MobclickAgent.onPause(this)
         if (mWXSDKInstance != null) {
             mWXSDKInstance!!.onActivityPause()
         }
@@ -152,43 +111,4 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
             mWXSDKInstance!!.onActivityDestroy()
         }
     }
-
-
-    @Subscribe(thread = EventThread.MAIN_THREAD)
-    fun ongetJpush(userModel: EventModel) {
-        val params = HashMap<String, Any>()
-        params.put("c", userModel.c)
-        params.put("d", userModel.d)
-        params.put("e", userModel.e)
-        params.put("f", userModel.f)
-        mWXSDKInstance?.fireGlobalEventCallback("onJpushPortEvent", params)
-
-    }
-//
-//    protected var useThemestatusBarColor = false//是否使用特殊的标题栏背景颜色，android5.0以上可以设置状态栏背景色，如果不使用则使用透明色值
-//    protected var useStatusBarColor = true//是否使用状态栏文字和图标为暗色，如果状态栏采用了白色系，则需要使状态栏和图标为暗色，android6.0以上可以设置
-//
-//    protected fun setStatusBar() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//5.0及以上
-//            val decorView = window.decorView
-//            val option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//            decorView.systemUiVisibility = option
-//            //根据上面设置是否对状态栏单独设置颜色
-//            if (useThemestatusBarColor) {
-//                window.statusBarColor = resources.getColor(R.color.textColorPrimary)
-//            } else {
-//                window.statusBarColor = Color.TRANSPARENT
-//            }
-//
-////            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-//            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {//4.4到5.0
-//            val localLayoutParams = window.attributes
-//            localLayoutParams.flags = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or localLayoutParams.flags
-//        }
-//        if ( useStatusBarColor) {//android6.0以后可以对状态栏文字颜色和图标进行修改
-//            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-//        }
-//    }
-
 }

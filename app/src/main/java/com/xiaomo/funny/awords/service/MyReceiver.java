@@ -15,10 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.orhanobut.logger.Logger;
-import com.xiaomo.funny.awords.MyApp;
-import com.xiaomo.funny.awords.model.EventModel;
 import com.xiaomo.funny.awords.model.UserModel;
-import com.xiaomo.funny.awords.weex.bll.common.module.XBusinessLauncherModule;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,9 +73,9 @@ public class MyReceiver extends BroadcastReceiver {
 //                    if (retval < 0) {
 //
 //                        showToast("写失败", context);
-//                        XBusinessLauncherModule.sendMessageToJerryFromTom(context,XBusinessLauncherModule.getDeviceId(context),"处理失败");
+//                        CommonModule.sendMessageToJerryFromTom(context,CommonModule.getDeviceId(context),"处理失败");
 //                    } else {
-//                        XBusinessLauncherModule.sendMessageToJerryFromTom(context,XBusinessLauncherModule.getDeviceId(context),"正在处理");
+//                        CommonModule.sendMessageToJerryFromTom(context,CommonModule.getDeviceId(context),"正在处理");
 //                        showToast("写成功", context);
 //                    }
 //                } else {

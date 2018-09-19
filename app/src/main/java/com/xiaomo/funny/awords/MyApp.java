@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.multidex.MultiDex;
 
 
+import com.code19.library.DeviceUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.hwangjr.rxbus.Bus;
 import com.orhanobut.logger.AndroidLogAdapter;
@@ -15,13 +16,16 @@ import com.orhanobut.logger.Logger;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
-import com.xiaomo.funny.awords.weex.bll.common.module.DialogModule;
-import com.xiaomo.funny.awords.weex.bll.common.module.XBusinessLauncherModule;
+import com.umeng.commonsdk.UMConfigure;
+import com.xiaomo.funny.awords.weex.bll.common.module.CommonModule;
 import com.xiaomo.funny.awords.weex.extend.adapter.FrescoImageAdapter;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import cn.jpush.android.api.JPushInterface;
 
 
 public class MyApp extends Application {
@@ -61,18 +65,29 @@ public class MyApp extends Application {
         super.onCreate();
         context = this;
         MultiDex.install(this);
+//        UMConfigure.init(this, UMConfigure.DEVICE_TYPE_PHONE, "5ba0c677b465f569af00025c");
+        UMConfigure.setLogEnabled(true);
+        UMConfigure.init(this, "5ba0c677b465f569af00025c", "all", UMConfigure.DEVICE_TYPE_PHONE, "");
+
         Logger.addLogAdapter(new AndroidLogAdapter());
         InitConfig config = new InitConfig.Builder().setImgAdapter(new FrescoImageAdapter()).build();
         WXSDKEngine.initialize(this, config);
         Fresco.initialize(this);
         registerActivityListener();
         try {
-            WXSDKEngine.registerModule("businessLauncher", XBusinessLauncherModule.class);
-            WXSDKEngine.registerModule("dialog", DialogModule.class);
+            WXSDKEngine.registerModule("CommonModule", CommonModule.class);
         } catch (WXException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private void jpush() {
+        JPushInterface.init(this);
+        String registrationID = JPushInterface.getRegistrationID(this);
+        String appId = DeviceUtils.getAndroidID(this);
+
+        JPushInterface.setAlias(this, (int) (new Date().getTime()), appId);
     }
 
     @Override
