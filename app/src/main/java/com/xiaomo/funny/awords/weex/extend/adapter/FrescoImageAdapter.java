@@ -212,6 +212,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.avos.avoscloud.LogUtil;
 import com.facebook.common.executors.UiThreadImmediateExecutorService;
 import com.facebook.common.internal.Preconditions;
 import com.facebook.common.logging.FLog;
@@ -351,7 +352,9 @@ public class FrescoImageAdapter implements IWXImgLoaderAdapter {
                                             }
                                             // boolean hasResult =  null != closeableStaticBitmap.getUnderlyingBitmap();
                                         } else {
-                                            throw new UnsupportedOperationException("Unrecognized image class: " + closeableImage);
+                                            imageReference.close();
+                                            LogUtil.log.e("Unrecognized image class: " + closeableImage);
+//                                            throw new UnsupportedOperationException("Unrecognized image class: " + closeableImage);
                                         }
                                     } finally {
                                         imageReference.close();

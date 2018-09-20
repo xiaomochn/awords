@@ -38,11 +38,11 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
 //            val host = "http://192.168.1.8:8081/"
 //        http@ //10.5.119.243:1234/homevue/dist/
 //            val host = "http://oqgi5s4fg.bkt.clouddn.com/homevue/"\
-        if (MyApp.getInstance().isDebug) {
-            host = "http://10.5.119.243:1234/homevue/dist/"
-        } else {
-            host = "http://financ.umoney.cc/aworld/module/awrold/HomePage"
-        }
+//        if (MyApp.getInstance().isDebug) {
+//            host = "http://10.5.119.243:1234/homevue/dist/"
+//        } else {
+            host = "http://financ.umoney.cc/aworld/app/v100/"
+//        }
 
 //            host = "http://financ.umoney.cc/"
 //            val url = host + "dist/index.js"
