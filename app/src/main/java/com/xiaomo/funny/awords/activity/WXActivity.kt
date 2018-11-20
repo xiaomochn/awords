@@ -30,7 +30,7 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
         //远程路径
         var path = intent?.extras?.getString("url")
         var param = intent?.extras?.getString("param")
-        var host = "http://10.5.6.245:8081/"
+        var host = "http://10.5.6.243:1234/"
         if (param == null) {
             //data必须是json结构的字符串
             param = "{}"
@@ -41,21 +41,20 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
 //        if (MyApp.getInstance().isDebug) {
 //            host = "http://10.5.119.243:1234/homevue/dist/"
 //        } else {
-            host = "http://financ.umoney.cc/aworld/app/v100/"
+//            host = "http://financ.umoney.cc/aworld/app/v100/"
 //        }
 
 //            host = "http://financ.umoney.cc/"
 //            val url = host + "dist/index.js"
-        host = "http://10.5.119.243:1234/homevue/dist/"
+//        host = "http://10.5.119.243:1234/homevue/dist/"
         if (path == null) {
-            path = "module/aworld/HomePage"
+            path = "dist/module/"
         }
-        val url = host + path + ".js"
+//        val url = host + path + ".js"
 
-//            val url = "file://assets/dist/" + path + ".js"
+            val url = "file://assets/dist/module/aworld/example.js"
         renderPageByURL(url, param)
 
-        MobclickAgent.onEvent(this,"pageopen",path)
     }
 
 
@@ -82,7 +81,6 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
     override fun onException(instance: WXSDKInstance, errCode: String, msg: String) {}
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onResume(this)
         if (mWXSDKInstance != null) {
             mWXSDKInstance!!.onActivityResume()
         }
@@ -91,7 +89,7 @@ class WXActivity : AppCompatActivity(), IWXRenderListener {
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPause(this)
+
         if (mWXSDKInstance != null) {
             mWXSDKInstance!!.onActivityPause()
         }

@@ -30,7 +30,7 @@ import com.taobao.weex.common.WXModule;
 import com.xiaomo.funny.awords.MyApp;
 import com.xiaomo.funny.awords.activity.WXActivity;
 import com.xiaomo.funny.awords.model.UserModel;
-import com.xiaomo.funny.awords.util.QiniuUploadUitls;
+
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -101,32 +101,6 @@ public class CommonModule extends WXModule {
         filePath = cursor.getString(columnIndex);
         cursor.close();
         return filePath;
-    }
-
-    @JSMethod
-    public void uploadFile(String path, final JSCallback callbackId) {
-
-        QiniuUploadUitls.getInstance().uploadImage(path, new QiniuUploadUitls.QiniuUploadUitlsListener() {
-
-            @Override
-            public void onSucess(String fileUrl) {
-                // TODO Auto-generated method stub
-                callbackId.invoke(fileUrl);
-            }
-
-            @Override
-            public void onProgress(int progress) {
-                // TODO Auto-generated method stub
-                // pbProgress.setProgress(progress);
-            }
-
-            @Override
-            public void onError(int errorCode, String msg) {
-                // TODO Auto-generated method stub
-                // showToast("errorCode=" + errorCode + ",msg=" + msg);
-            }
-        });
-        return;
     }
 
     /**

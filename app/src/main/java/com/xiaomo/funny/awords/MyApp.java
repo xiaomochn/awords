@@ -76,6 +76,7 @@ public class MyApp extends Application {
         registerActivityListener();
         try {
             WXSDKEngine.registerModule("CommonModule", CommonModule.class);
+            WXSDKEngine.registerComponent("password-input", LKLSecurityEditText.class);
         } catch (WXException e) {
             e.printStackTrace();
         }

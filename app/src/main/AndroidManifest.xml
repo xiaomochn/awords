@@ -21,7 +21,12 @@
 
 
         </activity>
-
+        <activity
+            android:name="cn.cloudcore.iprotect.plugin.CKbdActivity"
+            android:configChanges="orientation"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent" />
         <receiver android:name="com.avos.avoscloud.AVBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
