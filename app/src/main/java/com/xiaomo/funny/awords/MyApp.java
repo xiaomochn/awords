@@ -14,6 +14,7 @@ import com.hwangjr.rxbus.Bus;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
 import com.umeng.commonsdk.UMConfigure;
@@ -64,13 +65,16 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         context = this;
+        WXEnvironment.sApplication = this;
         MultiDex.install(this);
 //        UMConfigure.init(this, UMConfigure.DEVICE_TYPE_PHONE, "5ba0c677b465f569af00025c");
-        UMConfigure.setLogEnabled(true);
-        UMConfigure.init(this, "5ba0c677b465f569af00025c", "all", UMConfigure.DEVICE_TYPE_PHONE, "");
+//        UMConfigure.setLogEnabled(true);
+//        UMConfigure.init(this, "5ba0c677b465f569af00025c", "all", UMConfigure.DEVICE_TYPE_PHONE, "");
 
         Logger.addLogAdapter(new AndroidLogAdapter());
         InitConfig config = new InitConfig.Builder().setImgAdapter(new FrescoImageAdapter()).build();
+        WXSDKEngine.addCustomOptions("appName", "WXSample");
+        WXSDKEngine.addCustomOptions("appGroup", "WXApp");
         WXSDKEngine.initialize(this, config);
         Fresco.initialize(this);
         registerActivityListener();

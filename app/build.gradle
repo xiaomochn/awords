@@ -8,6 +8,11 @@ apply plugin: 'com.taobao.android.weex.plugin.gradle'
 
 android {
     compileSdkVersion 26
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
     defaultConfig {
         applicationId "com.xiaomo.funny.awords"
         minSdkVersion 16
@@ -23,6 +28,10 @@ android {
                 JPUSH_APPKEY : "2fd908769007572c63e3a1c6", //JPush上注册的包名对应的appkey.
                 JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
         ]
+        ndk {
+            abiFilters "x86", "armeabi"
+        }
+
     }
 
     buildTypes {

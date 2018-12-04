@@ -92,7 +92,7 @@ public class LKLSecurityEditText extends WXComponent<SecurityEditText> {
     @JSMethod
     public void onActivityDestroy() {
         mPassEdit.clear();
-        mPassEdit.onDestroy();
+//        mPassEdit.onDestroy();
         managerDestroy();
         super.onActivityDestroy();
     }
@@ -124,12 +124,11 @@ public class LKLSecurityEditText extends WXComponent<SecurityEditText> {
     }
 
 
-
     @Override
     protected boolean setProperty(String key, Object param) {
         switch (key) {
             case "securityName":
-                String securityName ="passwordInput";
+                String securityName = "passwordInput";
                 if (securityName != null)
                     setSecurityName(securityName);
                 return true;
@@ -159,10 +158,13 @@ public class LKLSecurityEditText extends WXComponent<SecurityEditText> {
 
     @WXComponentProp(name = "securityName")
     public void setSecurityName(String securityName) {
+
+        securityName = securityName + Math.random();
         if (securityName == null || getHostView() == null) {
             return;
         }
         this.securityName = securityName;
+
         mPassEdit.setSecurityManager(manager = SecurityKeyboardUtil.lklPassword(mPassEdit, securityName));
     }
 
